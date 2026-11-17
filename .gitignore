@@ -1,0 +1,12 @@
+bin/
+obj/
+.vs/
+.idea/
+*.user
+*.suo
+config.json
+*.log
+saves/
+logs/
+__pycache__/
+*.pyc

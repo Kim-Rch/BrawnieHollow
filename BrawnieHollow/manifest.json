@@ -1,0 +1,10 @@
+{
+  "Name": "Brawnie Hollow",
+  "Author": "Rachman Nurhakim",
+  "Version": "0.1.0",
+  "Description": "A small Brawnie settlement, a working rival farmer, and two neighbors. First playable village prototype.",
+  "UniqueID": "RachmanNurhakim.BrawnieHollow",
+  "EntryDll": "BrawnieHollow.dll",
+  "MinimumApiVersion": "4.1.0",
+  "UpdateKeys": []
+}

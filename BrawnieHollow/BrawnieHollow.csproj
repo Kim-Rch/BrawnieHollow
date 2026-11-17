@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk">
+<PropertyGroup><TargetFramework>net6.0</TargetFramework><LangVersion>latest</LangVersion><Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings><Version>0.1.0</Version><GamePath>F:/Steam/steamapps/common/Stardew Valley</GamePath><EnableModDeploy>false</EnableModDeploy><EnableModZip>true</EnableModZip><EnableHarmony>false</EnableHarmony><CheckEolTargetFramework>false</CheckEolTargetFramework></PropertyGroup>
+<ItemGroup><None Include="../README.md" Link="README.md" CopyToOutputDirectory="PreserveNewest" /><PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.4.0" /></ItemGroup>
+</Project>
