@@ -10,7 +10,6 @@ namespace BrawnieHollow;
 public sealed class ModConfig
 {
     public SButton VisitKey { get; set; } = SButton.F8;
-    public bool ShowResidentNames { get; set; } = true;
 }
 
 /// <summary>
@@ -337,9 +336,10 @@ public sealed class ModEntry : Mod
 
     private void ButtonPressed(object? sender, ButtonPressedEventArgs e)
     {
-        if (Settlement.ShouldSuppressInput(Here, e.Button.IsActionButton(), e.Button.IsUseToolButton()))
+        bool menuOpen = Game1.activeClickableMenu != null || Game1.dialogueUp;
+        if (Settlement.ShouldSuppressInput(Here, e.Button.IsActionButton(), e.Button.IsUseToolButton(), menuOpen))
             Helper.Input.Suppress(e.Button);
-        if (!CanAct) return;
+        if (menuOpen || !CanAct) return;
         if (e.Button == config.VisitKey)
         {
             Helper.Input.Suppress(e.Button);
@@ -376,9 +376,10 @@ public sealed class ModEntry : Mod
 
     private void SuppressVillageInputs()
     {
-        if (!Here) return;
+        bool menuOpen = Game1.activeClickableMenu != null || Game1.dialogueUp;
+        if (!Here || menuOpen) return;
         foreach (SButton button in Enum.GetValues(typeof(SButton)))
-            if (Settlement.ShouldSuppressInput(true, button.IsActionButton(), button.IsUseToolButton()) && Helper.Input.IsDown(button))
+            if (Settlement.ShouldSuppressInput(true, button.IsActionButton(), button.IsUseToolButton(), menuOpen) && Helper.Input.IsDown(button))
                 Helper.Input.Suppress(button);
     }
 
@@ -386,13 +387,7 @@ public sealed class ModEntry : Mod
     {
         if (!Here || disabled) return;
         foreach (var npc in residents)
-        {
             npc.draw(e.SpriteBatch);
-            if (!config.ShowResidentNames) continue;
-            Vector2 screen = Game1.GlobalToLocal(Game1.viewport, npc.Position + new Vector2(32, -28));
-            Vector2 size = Game1.smallFont.MeasureString(npc.displayName);
-            Utility.drawTextWithShadow(e.SpriteBatch, npc.displayName, Game1.smallFont, screen - new Vector2(size.X / 2, 0), Color.Wheat, .8f);
-        }
     }
 
     private void RenderHud(object? sender, RenderedHudEventArgs e)

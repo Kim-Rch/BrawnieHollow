@@ -43,4 +43,31 @@ var inputApi = Assembly.Load("StardewModdingAPI").GetType("StardewModdingAPI.IIn
 Check(new[] {"Suppress","IsDown","IsSuppressed"}.All(n => inputApi.GetMethod(n) != null), "installed held-input suppression APIs resolve");
 var team = gameAssembly.GetType("StardewValley.FarmerTeam",true)!;
 Check(team.GetField("returnedDonations") != null && team.GetField("newLostAndFoundItems") != null && gameAssembly.GetType("StardewValley.SaveGame",true)!.GetField("returnedDonations") != null, "durable lost-and-found collection and vanilla save field resolve");
+// Inspect actual compiled render calls without requiring a graphics context.
+var opcodes = typeof(System.Reflection.Emit.OpCodes).GetFields(BindingFlags.Public | BindingFlags.Static)
+    .Where(f => f.FieldType == typeof(System.Reflection.Emit.OpCode))
+    .Select(f => (System.Reflection.Emit.OpCode)f.GetValue(null)!)
+    .ToDictionary(o => unchecked((ushort)o.Value));
+var render = entry.GetMethod("RenderWorld", BindingFlags.Instance | BindingFlags.NonPublic)!;
+var il = render.GetMethodBody()!.GetILAsByteArray()!;
+var renderCalls = new List<MethodBase>();
+for (int offset = 0; offset < il.Length;)
+{
+    ushort code = il[offset++];
+    if (code == 0xfe) code = (ushort)(0xfe00 | il[offset++]);
+    var op = opcodes[code];
+    if (op.OperandType == System.Reflection.Emit.OperandType.InlineMethod)
+        renderCalls.Add(render.Module.ResolveMethod(BitConverter.ToInt32(il, offset))!);
+    offset += op.OperandType switch
+    {
+        System.Reflection.Emit.OperandType.InlineNone => 0,
+        System.Reflection.Emit.OperandType.ShortInlineBrTarget or System.Reflection.Emit.OperandType.ShortInlineI or System.Reflection.Emit.OperandType.ShortInlineVar => 1,
+        System.Reflection.Emit.OperandType.InlineVar => 2,
+        System.Reflection.Emit.OperandType.InlineI8 or System.Reflection.Emit.OperandType.InlineR => 8,
+        System.Reflection.Emit.OperandType.InlineSwitch => 4 + 4 * BitConverter.ToInt32(il, offset),
+        _ => 4
+    };
+}
+Check(renderCalls.Any(m => m.Name == "draw" && m.DeclaringType!.IsAssignableFrom(gameAssembly.GetType("StardewValley.NPC", true)!)), "world rendering still draws resident sprites");
+Check(!renderCalls.Any(m => m.Name is "drawTextWithShadow" or "DrawString" or "MeasureString"), "world rendering never draws floating resident name labels, including with old configs");
 Console.WriteLine("HEADLESS ASSEMBLY SMOKE PASSED (not a graphical gameplay test)");

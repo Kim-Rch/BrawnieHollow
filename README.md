@@ -22,7 +22,7 @@ Requires Stardew Valley 1.6 and SMAPI 4.1 or later. Extract `BrawnieHollow 0.1.0
 - Alternatively use the SMAPI console commands **`bh_visit`**, **`bh_return`**, and **`bh_status`**.
 - The sign at the village's southern path is another return interaction: stand nearby and use your normal action button.
 - Stand within two tiles of a resident and use the action button to talk.
-- `config.json` appears after launch. Change `VisitKey` if F8 conflicts with another mod; `ShowResidentNames` toggles name labels.
+- `config.json` appears after launch. Change `VisitKey` if F8 conflicts with another mod. Residents have no floating name labels; their names remain in dialogue. Older `ShowResidentNames` config entries are ignored.
 
 There is **no bus-stop sign and no entrance/world-map edit** in this release. The shortcut and console commands are the actual access methods. Visiting is blocked during menus, events, minigames, saving, and warps.
 

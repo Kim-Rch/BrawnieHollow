@@ -14,7 +14,7 @@ public class Settlement
         try { cleanup(); } catch (Exception ex) { report(ex); }
         finally { relocate(); }
     }
-    public static bool ShouldSuppressInput(bool here, bool action, bool tool) => here && (action || tool);
+    public static bool ShouldSuppressInput(bool here, bool action, bool tool, bool menuOpen = false) => here && !menuOpen && (action || tool);
     public static bool ShouldCancelWarp(object? request, object? owned, object? destination, object? village) =>
         request != null && (ReferenceEquals(request, owned) || (village != null && ReferenceEquals(destination, village)));
     public static bool CanTick(bool ready, bool host, bool paused, bool saving) => ready && host && !paused && !saving;
